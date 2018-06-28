@@ -173,7 +173,7 @@ C_k &\le \frac{a}{b} C_{k-1} + \frac{T(b^t)}{b^t}
 \mathrm{Qsort}(A) =
 \begin{cases}
 [\,],& \text{if } |A| = 0\\
-(B, C) := \mathrm{split}(A\setminus a_p, a_p),\, \mathrm{Qsort}(B) \circ \mathrm{Qsort}(C)
+(B, C) := \mathrm{split}(A\setminus a_p, a_p),\, \mathrm{Qsort}(B) \circ [a_p] \circ\mathrm{Qsort}(C)
 \end{cases}
 \end{align*}
 ここで、$a_p$は配列$A$の要素の一つであり、$\mathrm{split}(A, a)$は配列$A$を$a$以下の値からなる配列$B$と$a$より大きい値からなる配列$C$へ分割する関数である。
@@ -243,8 +243,8 @@ $a_i$と$a_j$が比較されることはない。すべての要素は一様な�
 %[\,],& \text{if } |A| = 0\\
 (B, C) := \mathrm{split}(A, a_p)\text{と置く}\\
 a_p,& \text{if } |B| = k+1\\
-\mathrm{Qselect}(B, k),&\text{if } |B| \le k\\
-\mathrm{Qselect}(C, k-|B|),&\text{otherwise.}
+\mathrm{Qselect}(C, k-|B|),&\text{if } |B| \le k\\
+\mathrm{Qselect}(B\setminus a_p, k),&\text{otherwise.}
 \end{cases}
 \end{align*}
 
@@ -284,6 +284,17 @@ $n$を2の羃とすると
 \end{equation*}
 である。
 クイックソートと同様に大体中央にあるようなピボットを選んだ場合も$O(n)$時間であることはすぐに分かる。
+
+\if0
+ピボットをランダムに選んだ場合の平均
+\begin{equation*}
+X = U_n + U_{U_n} + U_{U_{U_n}} + \dotsb
+\end{equation*}
+ここで$\mathbb{E}[U_n] = n/2$より、$\mathbb{E}[U_{U_n}] = \mathbb{E}[U_n/2] = U_n/4$となり、
+\begin{equation*}
+\mathbb{E}[X] =  \frac{n}2 + \frac{n}4 + \frac{n}8 + \dotsb
+\end{equation*}
+\fi
 
 
 \section{中央値の中央値アルゴリズム}
