@@ -299,7 +299,7 @@ f_0(S) &:= f(S), & f_1(S) &:= f(S\cup\{n\}),& S\subseteq[n-1]
 より$\chi(n) = O(2^n n)$が得られる。
 高速ゼータ変換のC言語プログラムは次のようになる。
 \begin{lstlisting}[basicstyle=\ttfamily\normalsize,showstringspaces=false,language=C,frame=single]
-void zeta(int *A, int n){
+void zeta(int A[], int n){
   int i;
   int m = 1 << n;
   if(n == 0) return;
@@ -312,7 +312,7 @@ void zeta(int *A, int n){
 \end{lstlisting}
 これを展開して、再帰ではなく反復でゼータ変換を書くこともできる。詳しくは説明しない。
 \begin{lstlisting}[basicstyle=\ttfamily\normalsize,showstringspaces=false,language=C,frame=single]
-void zeta(int A, int n){
+void zeta(int A[], int n){
   int i, j;
   int m = 1 << n;
   for(i = 1; i < m; i <<= 1){
