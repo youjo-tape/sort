@@ -1,0 +1,463 @@
+\documentclass[a4paper,twoside,onecolumn,openany,article,10pt]{memoir}
+\usepackage{xeCJK}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumerate}
+%\usepackage{algorithm}
+%\usepackage{algorithmicx}
+%\usepackage{algpseudocode}
+\usepackage{ascmac}
+\usepackage{tikz}
+\usepackage{ulem}
+%\usepackage{stix}
+%\usepackage{bm}
+\defaultfontfeatures{Ligatures=TeX}
+
+\setCJKmainfont[BoldFont=Noto Sans CJK JP Bold]{Noto Serif CJK JP}
+%\setCJKmainfont{Noto Serif CJK JP}
+\setCJKsansfont{Noto Sans CJK JP}
+\setCJKmonofont{Noto Sans Mono CJK JP}
+
+\newtheorem{theorem}{定理}
+\theoremstyle{definition}
+\newtheorem{definition}{定義}
+\newtheorem{problem}{問題}
+\theoremstyle{remark}
+\newtheorem{remark}{\textbf{余談}}
+
+
+\setmainfont[BoldFont=Noto Sans CJK JP Bold]{Noto Serif CJK JP}
+\setsansfont{Noto Sans CJK JP}
+\setmonofont{Inconsolata}
+
+\usepackage{listings}
+
+%\renewcommand{\algorithmcfname}{アルゴリズム}
+
+
+
+\settrimmedsize{\stockheight}{\stockwidth}{*}
+
+%\setlrmarginsandblock{1.5in}{1in}{*}
+\setlrmarginsandblock{1.2in}{1.2in}{*}
+\setulmarginsandblock{1.2in}{1.5in}{*}
+\setheadfoot{20mm}{15mm}
+
+%\newlength{\linespace}
+%\setlength{\linespace}{\baselineskip}
+%\setlength{\headheight}{\onelineskip}
+%\setlength{\headsep}{\linespace}
+%\addtolength{\headsep}{-\topskip}
+
+%\setlength{\footskip}{\onelineskip}
+%\setlength{\footnotesep}{\onelineskip}
+
+\checkandfixthelayout
+
+\counterwithout{section}{chapter}
+\setsecnumdepth{subsubsection}
+
+
+\title{アルゴリズムとデータ構造\\\vspace{.5em} \Large その他の分割統治法}
+\date{2018年6月29日}
+\author{森~立平\\ \texttt{mori@c.titech.ac.jp}}
+
+\begin{document}
+\maketitle
+
+
+\noindent
+今日のメッセージ
+\begin{itemize}
+\item \textbf{分割統治法 = 「漸化式作ってそれをプログラムにするだけ」}
+\item \textbf{分割統治法の時間計算量のは漸化式を解けば得られる}
+\item ソート問題、選択問題以外にも分割統治法は使える
+\end{itemize}
+
+\noindent
+今日の目標
+\begin{itemize}
+\item 様々な分割統治法を習得する
+\end{itemize}
+
+
+
+
+\section{その他の分割統治法}
+今まで分割統治法の代表例としてマージソートとクイックソートを考えてきたが、その他の分割統治法を紹介する。
+
+
+\section{Karatsuba法}
+現在のコンピュータは基本的に64ビット整数の足し算や掛け算をする命令を持っている
+(64ビット同士の掛け算は最大で128ビットになるが、その結果も得られる。ただしC言語から直接はその機能は使えない)。
+巨大な数(例えば数千、数万ビットの数を想像してみよう)の掛け算は64ビット同士の掛け算と足し算の組み合せで計算することができる。
+10進数で一桁の掛け算、足し算しかできない我々が大きな数の掛け算ができるのと同様である。
+「一桁」の足し算と掛け算ができるコンピュータを使ってn桁の掛け算をするための時間計算量を考えよう。
+ここでいう時間計算量とは「一桁」の足し算と掛け算をする回数と定義する。
+この「一桁」というのは現在のコンピュータにとっては0以上$2^{64}-1$の値であるし人間にとっては0から9の値である。
+非負の$n$桁の数$x$と$y$について、その積$xy$を計算するアルゴリズムを考えよう。
+通常の筆算を使うと時間計算量は$O(n^2)$となる。
+しかし、分割統治法を使えばもっと高速に掛け算が計算できる。
+簡単のため、$x$と$y$の桁数$n$は2の羃としよう(上位の桁に0を詰めればそのようにできるし桁数は高々2倍にしかならない)。
+$x$を上位$n/2$桁$x_1$と下位$n/2$桁$x_0$に分割する。
+一桁の数を0以上$K-1$以下とし、$M=K^{n/2}$とすると
+\begin{align*}
+x &= x_1 M + x_0\\
+y &= y_1 M + y_0
+\end{align*}
+が成り立つ。
+この表現を使えば
+\begin{equation*}
+xy = x_1y_1 M^2 + (x_1 y_0 + x_0 y_1) M + x_0 y_0
+\end{equation*}
+が得られる。
+この漸化式に従って得られる分割統治法のアルゴリズムの時間計算量$\chi(n)$は
+\begin{equation*}
+\chi(n) = 4\chi(n/2) + cn
+\end{equation*}
+を満たす(足し算の時間計算量は$O(n)$である)。この漸化式を解けば$\chi(n)=O(n^2)$となり、筆算の時間計算量と同じオーダーになる。
+
+一方で$z_0, z_1, z_2$を次のように定義するとする。
+\begin{align*}
+z_0 &:= x_0y_0\\
+z_1 &:= x_1y_1\\
+z_2 &:= (x_0+x_1)(y_0+y_1)
+\end{align*}
+そうすると$z_2-z_1-z_0=x_0y_1+x_1y_0$より
+\begin{equation*}
+xy = z_1 M^2 + (z_2-z_1-z_0) M + z_0
+\end{equation*}
+が得られる。この漸化式に従って得られる分割統治法のアルゴリズムをKaratsuba法と呼ぶ。
+この右辺では$n/2$桁の掛け算を3回しかしていないので、Karatsuba法の時間計算量$\chi(n)$は
+\begin{equation*}
+\chi(n) = 3\chi(n/2) + cn
+\end{equation*}
+を満たす。
+$b_n:=\chi(n)/n$とおくと、
+\begin{equation*}
+b_n = \frac{3}{2} b_{n/2} + c
+\end{equation*}
+これを解くと
+\begin{align*}
+b_n + 2c &= \frac{3}{2} \left(b_{n/2} + 2c\right)\\
+&= \left(\frac{3}{2}\right)^{\log n} \left(b_{1} + 2c\right)
+\end{align*}
+
+よって$\chi(n) = O(3^{\log n}) = O(n^{\log 3})$となる。$\log 3 \approx 1.585$なので、通常の筆算よりも漸近的に高速であることが分かる。
+一方でもっと高速な整数乗算アルゴリズムも存在する。高速フーリエ変換を使うものには$O(n\log n \log\log n)$時間のアルゴリズムもある(しかし
+実際には$n$がかなり大きくないとKaratsuba法など他のアルゴリズムよりも遅い)。
+
+
+\section{Strassenのアルゴリズム}
+$n\times n$行列同士の掛け算をするアルゴリズムを考えよう。
+行列の成分となっている数同士の掛け算と足し算の回数を時間計算量と定義する。
+$n\times n$行列$A$と$B$について$C=AB$とおくと
+\begin{equation*}
+C_{ij} = \sum_{k=1}^n A_{ik}B_{kj}
+\end{equation*}
+が成り立つ。
+この式に従って計算すると、1成分あたり$O(n)$回の掛け算と足し算が必要なので、全体で$O(n^3)$時間かかる。
+
+$n$を2羃と仮定する(行列に0成分を詰めることで2の羃に切り上げることができる)。
+$n\times n$行列$A, B, C$を$(n/2)\times (n/2)$行列に分解して次の表現を得る。
+\begin{align*}
+A&=\begin{bmatrix}
+A_{11}& A_{12}\\
+A_{21}& A_{22}
+\end{bmatrix},&
+B&=\begin{bmatrix}
+B_{11}& B_{12}\\
+B_{21}& B_{22}
+\end{bmatrix},&
+C&=\begin{bmatrix}
+C_{11}& C_{12}\\
+C_{21}& C_{22}
+\end{bmatrix}.
+\end{align*}
+そうすると
+\begin{align*}
+C_{11} &= A_{11}B_{11} + A_{12}B_{21}\\
+C_{12} &= A_{11}B_{12} + A_{12}B_{22}\\
+C_{21} &= A_{21}B_{11} + A_{22}B_{21}\\
+C_{22} &= A_{21}B_{12} + A_{22}B_{22}\\
+\end{align*}
+が成り立つ。この漸化式に従った分割統治法アルゴリズムの時間計算量$\chi(n)$は
+\begin{equation*}
+\chi(n) = 8\chi(n/2) + cn^2
+\end{equation*}
+を満たす。これを解くと$\chi(n)=O(n^3)$が得られる。
+一方で、行列$P_1,\dotsc,P_7$を以下のように定義する。
+\begin{align*}
+P_1 &:= A_{11}(B_{12}-B_{22})\\
+P_2 &:= (A_{11}+A_{12})B_{22}\\
+P_3 &:= (A_{21}+A_{22})B_{11}\\
+P_4 &:= A_{22}(B_{21}-B_{11})\\
+P_5 &:= (A_{11}+A_{22})(B_{11}+B_{22})\\
+P_6 &:= (A_{12}-A_{22})(B_{21}+B_{22})\\
+P_7 &:= (A_{11}-A_{21})(B_{11}+B_{12})
+\end{align*}
+すると、
+\begin{align*}
+C_{11} &=P_5+P_4-P_2+P_6\\
+C_{12} &=P_1+P_2\\
+C_{21} &=P_3+P_4\\
+C_{22} &=P_5+P_1-P_3-P_7
+\end{align*}
+が成り立つ。
+$P_1,\dotsc,P_7$の計算には7回の$(n/2)\times(n/2)$行列の乗算が必要なので、
+この漸化式に従った分割統治法アルゴリズムの時間計算量$\chi(n)$は
+\begin{equation*}
+\chi(n) = 7\chi(n/2) + cn^2
+\end{equation*}
+を満たす。
+この漸化式を解くと$\chi(n)=O(n^{\log 7})$が得られる。
+$\log 7 \approx 2.807$なので、通常のアルゴリズムよりも漸近的に高速であることが分かる。
+一方でもっと高速な行列乗算アルゴリズムも存在する。
+2018年6月現在で最も高速な行列乗算アルゴリズムの時間計算量は$O(n^{2.3728639})$である。
+
+
+\if0
+\begin{lstlisting}[basicstyle=\ttfamily\normalsize,showstringspaces=false,language=C,frame=single]
+void multiply(int A[N][N], int B[N][N], int C[N][N]){
+  int i, j, k;
+  for(i = 0; i < N; i++){
+    for(j = 0; j < N; j++){
+      C[i][j] = 0;
+      for(k = 0; k < N; k++){
+        C[i][j] += A[i][k] * B[k][j];
+      }
+    }
+  }
+}
+\end{lstlisting}
+\fi
+
+\section{高速ゼータ変換}
+集合$\{1,2,\dotsc,\}=:[n]$上の集合関数$f\colon 2^{[n]}\to\mathbb{R}$についてゼータ変換を次のように定義する。
+\begin{definition}
+ゼータ変換$\widehat{f}\colon 2^{[n]}\to\mathbb{R}$を
+\begin{equation*}
+\widehat{f}(T) := \sum_{S\subseteq T} f(S)
+\end{equation*}
+と定義する。
+\end{definition}
+このゼータ変換から$f$に戻すことができる。
+\begin{theorem}\label{thm:mobius}
+\begin{equation*}
+f(S) = \sum_{T\subseteq S} (-1)^{|S|-|T|} \widehat{f}(T)
+\end{equation*}
+\end{theorem}
+\begin{proof}
+\begin{align*}
+\sum_{T\subseteq S} (-1)^{|S|-|T|} \widehat{f}(T)
+&=
+\sum_{T\subseteq S} (-1)^{|S|-|T|} \sum_{V\subseteq T}f(V)\\
+&=
+\sum_{V\subseteq S} \left(\sum_{V\subseteq T\subseteq S} (-1)^{|S|-|T|}\right) f(V).
+\end{align*}
+ここで
+\begin{align*}
+\sum_{V\subseteq T\subseteq S} (-1)^{|S|-|T|} = 
+\begin{cases}
+1,&\text{if } V = S\\
+0,&\text{otherwise}.
+\end{cases}
+\end{align*}
+となることを示せばよい。
+$V = S$ のときに左辺が1となるのは明らか。
+$V \subsetneq S$のとき任意に選んだ$x\in S\setminus V$に対して
+\begin{align*}
+\sum_{V\subseteq T\subseteq S} (-1)^{|S|-|T|} = 
+\sum_{V\subseteq T\subseteq S\setminus\{x\}} \left((-1)^{|S|-|T|}  + (-1)^{|S|-|T\cup\{x\}|}\right)
+=0.
+\end{align*}
+\end{proof}
+
+ゼータ変換の時間計算量を考えよう。整数の四則演算は定数時間でできると仮定しよう。
+ゼータ変換を定義に従って素朴に計算すると、すべての要素を計算するのに$O(4^n)$時間かかる(少し工夫すると$O(3^n)$にはなる)。
+高速ゼータ変換と呼ばれるアルゴリズムはゼータ変換を$O(n 2^n)$時間で計算する。
+集合関数$f\colon 2^{[n]}\to\mathbb{R}$に対して、$f_0, f_1\colon 2^{[n-1]}\to\mathbb{R}$を
+\begin{align*}
+f_0(S) &:= f(S), & f_1(S) &:= f(S\cup\{n\}),& S\subseteq[n-1]
+\end{align*}
+と定義すると、
+\begin{align*}
+\widehat{f}(S) =
+\begin{cases}
+\widehat{f_0}(S),&\text{if } n\notin S\\
+\widehat{f_0}(S)+\widehat{f_1}(S),&\text{otherwise}
+\end{cases}
+\end{align*}
+という漸化式が得られる。
+この漸化式に従ってゼータ変換を計算するのが高速ゼータ変換である。
+\begin{equation*}
+\chi(n) = 2\chi(n-1) + c2^n
+\end{equation*}
+より$\chi(n) = O(2^n n)$が得られる。
+高速ゼータ変換のC言語プログラムは次のようになる。
+\begin{lstlisting}[basicstyle=\ttfamily\normalsize,showstringspaces=false,language=C,frame=single]
+void zeta(int *A, int n){
+  int i;
+  int m = 1 << n;
+  if(n == 0) return;
+  zeta(A, n - 1);
+  zeta(A + m / 2, n - 1);
+  for(i = 0; i < m / 2; i++){
+    A[i + m / 2] += A[i];
+  }
+}
+\end{lstlisting}
+これを展開して、再帰ではなく反復でゼータ変換を書くこともできる。詳しくは説明しない。
+\begin{lstlisting}[basicstyle=\ttfamily\normalsize,showstringspaces=false,language=C,frame=single]
+void zeta(int A, int n){
+  int i, j;
+  int m = 1 << n;
+  for(i = 1; i < m; i <<= 1){
+    for(j = 0; j < m; j++){
+      if(j & i) A[j] += A[j ^ i];
+    }
+  }
+}
+\end{lstlisting}
+
+この高速ゼータ変換を用いれば、色々な問題が高速に解けるようになる。
+\begin{problem}\label{prob:c}
+集合$[n]:=\{1,2,\dotsc,n\}$の部分集合$S_1,S_2,\dotsc,S_m$と整数$k\in[m]$が与えられているとき、
+組$(i_1,\dotsc,i_k)\in[m]^k$で$\bigcup_{j=1}^k S_{i_j}=[n]$となるものの個数を求めよ。
+\end{problem}
+\begin{proof}[解き方]
+素朴に全探索すると$2^m$時間はかかってしまうが、この問題には$O(2^nn)$時間アルゴリズムが存在する。
+解に対応する集合関数$g\colon 2^{[n]}\to\mathbb{R}$を
+\begin{equation*}
+g(S):= \left|\left\{(i_1,\dotsc,i_k)\in[m]^k\mid \bigcup_{j=1}^k S_{i_j} = S\right\}\right|
+\end{equation*}
+と定義する。
+すると$g([n])$が解となる。
+$g$のゼータ変換$\widehat{g}$は
+\begin{equation*}
+\widehat{g}(T)= \sum_{S\subseteq T}g(S)=\left|\left\{(i_1,\dotsc,i_k)\in[m]^k\mid \bigcup_{j=1}^k S_{i_j} \subseteq T\right\}\right|
+\end{equation*}
+を満たす。
+\if0
+集合関数$f\colon 2^{[n]}\to\mathbb{R}$ と $g\colon 2^{[n]}\to \mathbb{R}$について被覆積(covering product)$f\star g\colon 2^{[n]}\to\mathbb{R}$を
+\begin{equation*}
+(f\star g)(S) := \sum_{\substack{T, V\subseteq[n],\\ T\cup V = S}} f(T) g(V)
+\end{equation*}
+と定義する。
+この被覆積を使って問題~\ref{prob:c}の解を表現することを考えよう。
+\fi
+一方で
+\begin{equation*}
+f(S):= \left|\{i\in[m]\mid S_i = S\}\right|
+\end{equation*}
+と定義すると
+\begin{equation*}
+\widehat{f}(T) = \sum_{S\subseteq T}f(S) =
+\left|\left\{i\in[m] \mid S_i\subseteq T\right\}\right|
+\end{equation*}
+を満たす。
+よって$\widehat{g}(S)=\widehat{f}(S)^k$である。
+\if0
+このとき、$f^{\star k} := f\star f\star \dotsm \star f$は
+\begin{equation*}
+f^{\star k}(S) := \sum_{\substack{T_1, T_2,\dotsc, T_k\subseteq[n],\\ \bigcup_{i=1}^k T_i = S}} f(T_1)f(T_2)\dotsm f(T_k)
+\end{equation*}
+を満たす。よって$f^{\star k}(S)$は和集合が$S$になるような組$(S_{i_1},\dotsc,S_{i_k})$の個数であり、$f^{\star k}([n])$が求める解である。
+
+
+\begin{theorem}[畳み込み定理]
+\begin{equation*}
+\widehat{f\star g}(T) = \widehat{f}(T)\widehat{g}(T)
+\end{equation*}
+\end{theorem}
+\begin{proof}
+\begin{align*}
+\widehat{f\star g}(T) = 
+\sum_{S\subseteq T} (f\star g)(S)
+=
+\sum_{S\subseteq T} 
+\sum_{\substack{U, V\subseteq [n]\\ U\cup V = S}} f(U) g(V)
+=
+\sum_{U, V\subseteq T} f(U) g(V)
+=\widehat{f}(T)\widehat{g}(V).
+\end{align*}
+\end{proof}
+\fi
+
+よって$f$から高速ゼータ変換で$\widehat{f}$を計算し、各成分を$k$乗することで$\widehat{g}$が求まる。
+そして定理~\ref{thm:mobius}より$\widehat{g}$から$g([n])$が高々$O(2^nn)$時間で計算できる。
+よって全体で$O(2^n n)$時間で計算ができた。
+\end{proof}
+
+
+
+
+\begin{problem}
+集合$[n]:=\{1,2,\dotsc,n\}$の部分集合$S_1,S_2,\dotsc,S_m$が与えられているとき、
+集合$K\subseteq[n]$で$\bigcup_{i\in K} S_{i}=[n]$を満たすものの最小のサイズ$|K|$を求めよ。
+\end{problem}
+この問題は問題~\ref{prob:c}と二分探索を使えば$O(2^n n\log n )$時間で解ける。
+
+\begin{problem}\label{prob:s}
+集合$[n]:=\{1,2,\dotsc,n\}$の部分集合$S_1,S_2,\dotsc,S_m$と整数$k\in[m]$が与えられているとき、
+集合$\{i_1,\dotsc,i_k\}\subseteq [m]$で$\bigcup_{j=1}^k S_{i_j}=[n]$となるものの個数を求めよ。
+\end{problem}
+\begin{proof}[解き方]
+解に対応する集合関数$g\colon 2^{[n]}\to\mathbb{R}$を
+\begin{equation*}
+g(S) := \left|\left\{\{i_1,\dotsc,i_k\}\subseteq[m] \mid \bigcup_{j=1}^k S_{i_j}=S\right\}\right|
+\end{equation*}
+とおくと$g([n])$が解となる。$g$のゼータ変換$\widehat{g}$は
+\begin{equation*}
+\widehat{g}(T) = \sum_{S\subseteq T}g(S) =
+\left|\left\{\{i_1,\dotsc,i_k\}\subseteq[m] \mid \bigcup_{j=1}^k S_{i_j}\subseteq T\right\}\right|
+\end{equation*}
+を満たす。
+一方で
+\begin{equation*}
+\widehat{f}(T) = \sum_{S\subseteq T}f(S) =
+\left|\left\{i\in[m] \mid S_i\subseteq T\right\}\right|
+\end{equation*}
+よって
+\begin{equation*}
+\widehat{g}(T) = \binom{\widehat{f}(T)}{k}
+\end{equation*}
+である。
+高速ゼータ変換を用いれば、問題~\ref{prob:c}と同様に$O(2^nn)$時間で問題~\ref{prob:s}が解ける.
+\end{proof}
+
+%高速ゼータ変換と類似のものに高速アダマール変換と高速フーリエ変換がある。
+%畳み込み定理を使って畳み込み計算を
+
+\begin{problem}\label{prob:s}
+集合$[n]:=\{1,2,\dotsc,n\}$の部分集合$S_1,S_2,\dotsc,S_m$と集合$S^*\subseteq[n]$が与えられているとき、
+集合$V\subseteq [m]$で$\bigcup_{i\in V} S_{i}=S^*$となるものの個数を求めよ。
+\end{problem}
+\begin{proof}[解き方]
+解に対応する集合関数$g\colon 2^{[n]}\to\mathbb{R}$を
+\begin{equation*}
+g(S) := \left|\left\{V\subseteq[m] \mid \bigcup_{i\in V} S_{i}=S\right\}\right|
+\end{equation*}
+とおくと$g(S^*)$が解となる。$g$のゼータ変換$\widehat{g}$は
+\begin{equation*}
+\widehat{g}(T) = \sum_{S\subseteq T}g(S) =
+\left|\left\{V\subseteq[m] \mid \bigcup_{i\in V} S_{i}\subseteq T\right\}\right|
+\end{equation*}
+を満たす。
+一方で
+\begin{equation*}
+\widehat{f}(T) = \sum_{S\subseteq T}f(S) =
+\left|\left\{i\in[m] \mid S_i\subseteq T\right\}\right|
+\end{equation*}
+よって
+\begin{equation*}
+\widehat{g}(T) = 2^{\widehat{f}(T)}
+\end{equation*}
+である。
+高速ゼータ変換を用いれば、問題~\ref{prob:c}と同様に$O(2^n(n+m))$時間で問題~\ref{prob:s}が解ける.
+\end{proof}
+
+\end{document}
