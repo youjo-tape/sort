@@ -236,7 +236,7 @@ void multiply(int A[N][N], int B[N][N], int C[N][N]){
 \fi
 
 \section{高速ゼータ変換}
-集合$\{1,2,\dotsc,\}=:[n]$上の集合関数$f\colon 2^{[n]}\to\mathbb{R}$についてゼータ変換を次のように定義する。
+集合$\{1,2,\dotsc,n\}=:[n]$上の集合関数$f\colon 2^{[n]}\to\mathbb{R}$についてゼータ変換を次のように定義する。
 \begin{definition}
 ゼータ変換$\widehat{f}\colon 2^{[n]}\to\mathbb{R}$を
 \begin{equation*}
@@ -278,17 +278,17 @@ $V \subsetneq S$のとき任意に選んだ$x\in S\setminus V$に対して
 
 ゼータ変換の時間計算量を考えよう。整数の四則演算は定数時間でできると仮定しよう。
 ゼータ変換を定義に従って素朴に計算すると、すべての要素を計算するのに$O(4^n)$時間かかる(少し工夫すると$O(3^n)$にはなる)。
-高速ゼータ変換と呼ばれるアルゴリズムはゼータ変換を$O(n 2^n)$時間で計算する。
+高速ゼータ変換と呼ばれるアルゴリズムはゼータ変換を$O(2^n n)$時間で計算する。
 集合関数$f\colon 2^{[n]}\to\mathbb{R}$に対して、$f_0, f_1\colon 2^{[n-1]}\to\mathbb{R}$を
 \begin{align*}
 f_0(S) &:= f(S), & f_1(S) &:= f(S\cup\{n\}),& S\subseteq[n-1]
 \end{align*}
 と定義すると、
 \begin{align*}
-\widehat{f}(S) =
+\widehat{f}(T) =
 \begin{cases}
-\widehat{f_0}(S),&\text{if } n\notin S\\
-\widehat{f_0}(S)+\widehat{f_1}(S),&\text{otherwise}
+\widehat{f_0}(T),&\text{if } n\notin T\\
+\widehat{f_0}(T\setminus\{n\})+\widehat{f_1}(T\setminus\{n\}),&\text{otherwise}
 \end{cases}
 \end{align*}
 という漸化式が得られる。
@@ -329,7 +329,7 @@ void zeta(int A, int n){
 組$(i_1,\dotsc,i_k)\in[m]^k$で$\bigcup_{j=1}^k S_{i_j}=[n]$となるものの個数を求めよ。
 \end{problem}
 \begin{proof}[解き方]
-素朴に全探索すると$2^m$時間はかかってしまうが、この問題には$O(2^nn)$時間アルゴリズムが存在する。
+素朴に全探索すると$m^k$時間はかかってしまうが、この問題には$O(2^nn)$時間アルゴリズムが存在する。
 解に対応する集合関数$g\colon 2^{[n]}\to\mathbb{R}$を
 \begin{equation*}
 g(S):= \left|\left\{(i_1,\dotsc,i_k)\in[m]^k\mid \bigcup_{j=1}^k S_{i_j} = S\right\}\right|
