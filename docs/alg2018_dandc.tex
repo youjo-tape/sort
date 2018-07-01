@@ -433,15 +433,15 @@ g(S) := \left|\left\{\{i_1,\dotsc,i_k\}\subseteq[m] \mid \bigcup_{j=1}^k S_{i_j}
 %畳み込み定理を使って畳み込み計算を
 
 \begin{problem}\label{prob:s}
-集合$[n]:=\{1,2,\dotsc,n\}$の部分集合$S_1,S_2,\dotsc,S_m$と集合$S^*\subseteq[n]$が与えられているとき、
-集合$V\subseteq [m]$で$\bigcup_{i\in V} S_{i}=S^*$となるものの個数を求めよ。
+集合$[n]:=\{1,2,\dotsc,n\}$の部分集合$S_1,S_2,\dotsc,S_m$が与えられているとき、
+集合$V\subseteq [m]$で$\bigcup_{i\in V} S_{i}=[n]$となるものの個数を求めよ。
 \end{problem}
 \begin{proof}[解き方]
 解に対応する集合関数$g\colon 2^{[n]}\to\mathbb{R}$を
 \begin{equation*}
 g(S) := \left|\left\{V\subseteq[m] \mid \bigcup_{i\in V} S_{i}=S\right\}\right|
 \end{equation*}
-とおくと$g(S^*)$が解となる。$g$のゼータ変換$\widehat{g}$は
+とおくと$g([n])$が解となる。$g$のゼータ変換$\widehat{g}$は
 \begin{equation*}
 \widehat{g}(T) = \sum_{S\subseteq T}g(S) =
 \left|\left\{V\subseteq[m] \mid \bigcup_{i\in V} S_{i}\subseteq T\right\}\right|
