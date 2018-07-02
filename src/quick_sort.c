@@ -5,10 +5,37 @@
 
 int A[N];
 
+void swap(int *i, int *j){
+	int temp = *i;
+	*i = *j;
+	*j = temp;
+}
+
 /*
 A[0], A[1], ..., A[n-1] をソートして昇順に書き換える関数
 */
 void quick_sort(int A[], int n){
+	if(n <= 1) return;
+	int i, j, f, pivot = A[0];
+    
+    for(i = j = f = 1; i < n; i ++){
+        if(A[i] <= pivot){
+            
+			// 等しい要素は左右に等分配する
+			if(A[i] == pivot && !f){
+				f = 1;
+				continue;
+			}
+			
+			swap(&A[i], &A[j]);
+          	j ++;
+			f = 0;
+        }
+    }
+    swap(&A[j-1], &A[0]);
+    
+    quick_sort(A, j-1);
+    quick_sort(A+j, n-j);
 }
 
 int main(){
