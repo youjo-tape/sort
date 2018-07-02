@@ -41,7 +41,7 @@ void quick_sort(int A[], int n){
 int main(){
   int i;
   A[0] = 0;
-  A[1] = 0; //原始元
+  A[1] = 3; //原始元
   for(i=2;i<N;i++){
     A[i] = (long long int) A[i-1] * A[1] % N;
   }
@@ -50,6 +50,6 @@ int main(){
 
   quick_sort(A, N);
   for(i=0;i<N;i++){
-  //  if(A[i] != i) printf("ERROR %dth element is %d\n", i, A[i]);
+    if(A[i] != i) printf("ERROR %dth element is %d\n", i, A[i]);
   }
 }
